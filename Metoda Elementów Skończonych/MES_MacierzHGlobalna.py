@@ -136,8 +136,6 @@ class Element4Wezlowy:
 
 # Funkcja Do Odczytu I Analizowania Pliku Tekstowego
 
-# Funkcja Do Odczytu I Analizowania Pliku Tekstowego
-
 def AnalizujPlikWejsciowy(filename):
 
     global SimulationTime, SimulationStepTime, Conductivity, Alfa, Tot, InitialTemp
