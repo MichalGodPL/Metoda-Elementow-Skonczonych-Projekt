@@ -1,7 +1,17 @@
-# Ponowne załadowanie kodu z macierzH.py
-
-# Kod wprowadzony do środowiska wykonawczego
 import numpy as np
+import pandas as pd
+import os
+
+# Wczytaj macierz H z pliku CSV
+input_folder = 'C:/Users/Admin/Documents/GitHub/MetodaEliminacjiStudentow/Metoda Elementów Skończonych/Pliki Tekstowe'
+input_filename = 'MacierzHGlobalnaWyniki.csv'
+input_path = os.path.join(input_folder, input_filename)
+
+HGlobalne_df = pd.read_csv(input_path, header=None)
+HGlobalne = HGlobalne_df.values  # Konwersja DataFrame do macierzy NumPy
+
+print("Macierz H (wczytana z pliku CSV):")
+print(HGlobalne)
 
 # Define the global variables to store simulation parameters
 SimulationTime = None
@@ -17,7 +27,6 @@ ElementsNumber = None
 Nodes = []
 Elements = []
 
-
 # Element 4-node class definition
 class Elem4:
     def __init__(self, nodes):
@@ -29,7 +38,6 @@ class Elem4:
         self.boundary_edges = []  # Przechowywanie indeksów krawędzi brzegowych
 
     def find_boundary_edges(self, global_nodes, tolerance=1e-6):
-
         # Granice siatki (min i max współrzędnych)
         min_x = min(coord[0] for coord in global_nodes)
         max_x = max(coord[0] for coord in global_nodes)
@@ -86,37 +94,6 @@ class Elem4:
             })
         return results
 
-    # Oblicz lokalną macierz H dla elementu
-    def calculate_local_H(self):
-        H_local = np.zeros((4, 4))
-        global Conductivity
-
-        # Iterate over each Gauss point for numerical integration
-        for xi, eta in self.gauss_points:
-            # Pochodne funkcji kształtu w punkcie (xi, eta)
-            dN_dxi = self.pochodne_funkcji_ksztaltu(xi, eta)
-
-            # Oblicz macierz Jacobiego
-            J = self.jacobian(dN_dxi)
-            det_J = np.linalg.det(J)
-            inv_J = np.linalg.inv(J)
-
-            # Przekształć pochodne funkcji kształtu do przestrzeni globalnej
-            dN_dx_dy = np.dot(inv_J, dN_dxi)
-
-            # Macierz B (zawiera pochodne funkcji kształtu względem x i y)
-            B = np.zeros((2, 4))
-            B[0, :] = dN_dx_dy[0, :]  # dN/dx
-            B[1, :] = dN_dx_dy[1, :]  # dN/dy
-
-            # Składnik macierzy H w punkcie całkowania
-            H_contrib = Conductivity * (B.T @ B) * det_J
-
-            # Dodaj składnik do macierzy H elementu
-            H_local += H_contrib
-
-        return H_local
-
     def calculate_local_Hbc(self, alfa, tot):
         Hbc_local = np.zeros((4, 4))  # Lokalna macierz Hbc
         gauss_weights = [1, 1]  # Wagi Gaussa dla dwóch punktów
@@ -160,7 +137,6 @@ class Elem4:
                 Hbc_local += Hbc_contrib
 
         return Hbc_local
-
 
 # Function to read and parse the text file
 def parse_input_file(filename):
@@ -232,31 +208,13 @@ def parse_input_file(filename):
 
     return global_elements
 
-def aggregate_local_to_global(elements_objects, nodes_number):
-    # Globalna macierz H i Hbc
-    H_global = np.zeros((nodes_number, nodes_number))
-
-    # Dodanie alfa i tot (przykładowe wartości, można wczytać z pliku)
-    global Alfa, Tot
-
-    # Pętla po elementach
-    for elem, elem_nodes in zip(elements_objects, Elements):
-        H_local = elem.calculate_local_H()
-        Hbc_local = elem.calculate_local_Hbc(Alfa, Tot)
-
-        # Agreguj lokalne macierze H i Hbc do globalnej
-        for i, global_i in enumerate(elem_nodes):
-            for j, global_j in enumerate(elem_nodes):
-                H_global[global_i - 1, global_j - 1] += H_local[i, j] + Hbc_local[i, j]
-
-    return H_global
-
-
 # Ponowna próba agregacji
 filename = r"C:\Users\Admin\Desktop\Metoda Elementów Skończonych\Pliki Tekstowe\Test2_4_4_MixGrid.txt"
 
-
 elements_objects = parse_input_file(filename)
 
-H_global = aggregate_local_to_global(elements_objects, NodesNumber)
-print(H_global)
+# Kod do dalszego przetwarzania macierzy HGlobalne i obliczania macierzy Hbc
+for elem in elements_objects:
+    Hbc_local = elem.calculate_local_Hbc(Alfa, Tot)
+    print("Lokalna macierz Hbc dla elementu:")
+    print(Hbc_local)
