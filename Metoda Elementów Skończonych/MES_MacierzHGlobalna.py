@@ -4,6 +4,8 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 
+import os
+
 # Zdefiniuj Globalne Zmienne Do Przechowywania Parametrów Symulacji
 
 SimulationTime = None
@@ -305,3 +307,19 @@ plt.xlabel('Indeks Węzła')
 plt.ylabel('Indeks Węzła')
 
 plt.show()
+
+output_folder = 'C:/Users/Admin/Documents/GitHub/MetodaEliminacjiStudentow/Metoda Elementów Skończonych/Pliki Tekstowe'
+
+output_filename = 'MacierzHGlobalnaWyniki.csv'
+
+output_path = os.path.join(output_folder, output_filename)
+
+# Upewnij się, że Folder Istnieje
+
+os.makedirs(output_folder, exist_ok=True)
+
+# Zapisz DataFrame do pliku CSV
+
+HGlobalne_df.to_csv(output_path, index=False, header=False)
+
+print(f"Macierz H została zapisana do pliku: {output_path}")
