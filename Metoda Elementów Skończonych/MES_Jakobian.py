@@ -1,5 +1,7 @@
 import numpy as np
 
+import pandas as pd
+
 SimulationTime = None
 
 SimulationStepTime = None
@@ -200,7 +202,7 @@ def AnalizaWejsciowego(filename):
                 Elements.append(node_ids)
 
 
-filename = "Test1_4_4.txt"
+filename = r"C:\Users\Admin\Desktop\Metoda Elementów Skończonych\Pliki Tekstowe\Test1_4_4.txt"
 
 AnalizaWejsciowego(filename)
 
@@ -216,10 +218,14 @@ for elem_nodes in Elements:
     elements_objects.append(element)
 
 
+# Prezentacja Wyników Jacobiego Za Pomocą Pandas
+
 for idx, element in enumerate(elements_objects, start=1):
 
-    results = element.HLokalne()
+    print(f"Element {idx} Jacobian Results:")
 
-    print(results)
+    jacobian_results = element.HLokalne()
+
+    print(jacobian_results)
 
     print()

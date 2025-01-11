@@ -214,12 +214,13 @@ class Element4Wezlowy:
 
             WezlyKrawedzi = []
 
+
             # Zidentyfikuj Węzły na Krawędzi
 
             if edge == 0:  # Dolna krawędź (1-2)
 
                 WezlyKrawedzi = [0, 1]
-                
+
                 ksi_eta_points = [(gauss, -1) for gauss in gauss_points]
 
             elif edge == 1:  # Prawa krawędź (2-3)
@@ -261,7 +262,9 @@ class Element4Wezlowy:
 
                 # Długość krawędzi (elementarny Jakobian dla 1D)
 
-                DlugoscKrawedzi = np.linalg.norm(self.nodes[WezlyKrawedzi[1]] - self.nodes[WezlyKrawedzi[0]])
+                DlugoscKrawedzi = np.linalg.norm(
+
+                    self.nodes[WezlyKrawedzi[1]] - self.nodes[WezlyKrawedzi[0]])
 
                 WyznacznikJakobianaKrawedzi = DlugoscKrawedzi / 2
 
@@ -269,7 +272,7 @@ class Element4Wezlowy:
                 # Dodaj składnik do macierzy Hbc
 
                 SkladnikHbc = alfa * (np.outer(N, N) * GaussWagi[i] * WyznacznikJakobianaKrawedzi)
-
+                
                 HbcLokalne += SkladnikHbc
 
         return HbcLokalne
@@ -375,7 +378,7 @@ def AnalizujPlikWejsciowy(filename):
 
 # Ponowna próba agregacji
 
-filename = r"C:\Users\Admin\Desktop\Metoda Elementów Skończonych\Pliki Tekstowe\Test2_4_4_MixGrid.txt"
+filename = r"C:\Users\Admin\Desktop\Metoda Elementów Skończonych\Pliki Tekstowe\Test1_4_4.txt"
 
 AnalizujPlikWejsciowy(filename)
 

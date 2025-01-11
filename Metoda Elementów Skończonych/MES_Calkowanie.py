@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 
 def gauss_legendre_integration(func, points):
 
-    """ Funkcja wykonująca całkowanie numeryczne w układzie (-1, 1), przy użyciu schematów 2- i 3-punktowych Gaussa-Legendre'a.
+    """ Funkcja wykonująca całkowanie numeryczne w układzie (-1, 1), przy użyciu schematów 2-, 3- i 4-punktowych Gaussa-Legendre'a.
 
-    :param func: Funkcja 2D do całkowania  :param points: Liczba punktów (2 lub 3) w schemacie całkowania
+    :param func: Funkcja 2D do całkowania  :param points: Liczba punktów (2, 3 lub 4) w schemacie całkowania
 
     :return: Wynik całkowania.
 
@@ -31,9 +31,17 @@ def gauss_legendre_integration(func, points):
 
         nodes = [-np.sqrt(3/5), 0.0, np.sqrt(3/5)]
 
+    elif points == 4:
+
+        # Wagi i punkty dla schematu 4-punktowego
+
+        weights = [0.3478548451, 0.6521451549, 0.6521451549, 0.3478548451]
+
+        nodes = [-0.8611363116, -0.3399810436, 0.3399810436, 0.8611363116]
+
     else:
 
-        raise ValueError("Tylko schematy 2 i 3-punktowe są obsługiwane.")
+        raise ValueError("Tylko schematy 2, 3 i 4-punktowe są obsługiwane.")
 
 
     integral = 0
@@ -129,3 +137,10 @@ print(f"Wynik całkowania 2-punktowego: {result_2_points}\n\n")
 result_3_points = gauss_legendre_integration(example_function, points=3)
 
 print(f"Wynik całkowania 3-punktowego: {result_3_points}\n\n")
+
+
+# Całkowanie 4-punktowe
+
+result_4_points = gauss_legendre_integration(example_function, points=4)
+
+print(f"Wynik całkowania 4-punktowego: {result_4_points}\n\n")
