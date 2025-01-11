@@ -74,9 +74,9 @@ class Element4Wezlowy:
 
             WyznacznikJakobiego = np.linalg.det(J)
 
-            inv_J = np.linalg.inv(J)
+            OdwrotnoscJakobiego = np.linalg.inv(J)
 
-            Wyniki.append({ "Jakobian": J,  "Det(J)": WyznacznikJakobiego, "J^(-1)": inv_J })
+            Wyniki.append({ "Jakobian": J,  "Det(J)": WyznacznikJakobiego, "J^(-1)": OdwrotnoscJakobiego })
 
         return Wyniki
 
@@ -104,11 +104,11 @@ class Element4Wezlowy:
 
             WyznacznikJakobiego = np.linalg.det(J)
 
-            inv_J = np.linalg.inv(J)
+            OdwrotnoscJakobiego = np.linalg.inv(J)
 
             # Przekształć Pochodne Funkcji Kształtu do Przestrzeni Globalnej
 
-            dN_dx_dy = np.dot(inv_J, dN_dxi)
+            dN_dx_dy = np.dot(OdwrotnoscJakobiego, dN_dxi)
 
 
             # Macierz B Zawierająca Pochodne Funkcji Kształtu Wzglęgem X i Y
@@ -132,7 +132,7 @@ class Element4Wezlowy:
         return HLokalne
 
 
-# Function to read and parse the text file
+# Funkcja Do Odczytu I Analizowania Pliku Tekstowego
 
 def AnalizujPlikWejsciowy(filename):
 
@@ -144,7 +144,7 @@ def AnalizujPlikWejsciowy(filename):
 
         lines = file.readlines()
 
-        # Track which section we're in: "parameters", "nodes", "elements"
+        # Śledź Którą Sekcję Przetwarzamy: "Parametry", "Węzły", "Elementy"
 
         mode = "parameters"
 
@@ -167,12 +167,12 @@ def AnalizujPlikWejsciowy(filename):
 
             elif line.startswith('*BC'):
 
-                break  # Stop reading as we don't need boundary conditions here
+                break  # Przestań Czytać, Ponieważ Nie Potrzebujemy Tutaj Warunków Brzegowych
 
 
             if mode == "parameters":
 
-                # Parse global parameters
+                # Analizowanie Globalnych Parametrów
 
                 if line.startswith("SimulationTime"):
 
@@ -188,23 +188,23 @@ def AnalizujPlikWejsciowy(filename):
 
                 elif line.startswith("Alfa"):
 
-                    Alfa = int(line.split()[1])
+                    Alfa = float(line.split()[1])
 
                 elif line.startswith("Tot"):
 
-                    Tot = int(line.split()[1])
+                    Tot = float(line.split()[1])
 
                 elif line.startswith("InitialTemp"):
 
-                    InitialTemp = int(line.split()[1])
+                    InitialTemp = float(line.split()[1])
 
                 elif line.startswith("Density"):
 
-                    Density = int(line.split()[1])
+                    Density = float(line.split()[1])
 
                 elif line.startswith("SpecificHeat"):
 
-                    SpecificHeat = int(line.split()[1])
+                    SpecificHeat = float(line.split()[1])
 
                 elif line.startswith("Nodes number"):
 
