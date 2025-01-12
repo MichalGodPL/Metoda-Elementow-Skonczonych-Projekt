@@ -378,7 +378,7 @@ def AnalizujPlikWejsciowy(filename):
 
 # Ponowna próba agregacji
 
-filename = r"C:\Users\Admin\Desktop\Metoda Elementów Skończonych\Pliki Tekstowe\Test1_4_4.txt"
+filename = r"C:\Users\Admin\Desktop\Metoda Elementów Skończonych\Pliki Tekstowe\Test2_4_4_MixGrid.txt"
 
 AnalizujPlikWejsciowy(filename)
 

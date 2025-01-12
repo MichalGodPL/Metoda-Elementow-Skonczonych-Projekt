@@ -471,6 +471,8 @@ for elem_nodes in Elements:
     ObiektyElementow.append(element)
 
 
+P_results = []
+
 # Wydrukuj Macierz Hbc Dla Każdego Elementu i oblicz wektor P
 
 for i, element in enumerate(ObiektyElementow):
@@ -479,6 +481,8 @@ for i, element in enumerate(ObiektyElementow):
 
     P_local = element.ObliczLokalneP(Alfa, Tot)
 
+    P_results.append(P_local)
+
     print(f"\nMacierz HBC dla Elementu {i + 1}:")
 
     print(pd.DataFrame(Hbc_local))
@@ -486,3 +490,24 @@ for i, element in enumerate(ObiektyElementow):
     print(f"\nWektor P dla Elementu {i + 1}:")
     
     print(P_local)
+    
+
+output_folder = 'C:/Users/Admin/Documents/GitHub/MetodaEliminacjiStudentow/Metoda Elementów Skończonych/Pliki Tekstowe'
+
+output_filename = 'WektorPWyniki1_4_4.csv'
+
+output_path = os.path.join(output_folder, output_filename)
+
+
+# Ensure the folder exists
+
+os.makedirs(output_folder, exist_ok=True)
+
+
+# Convert P_results to DataFrame and save to CSV
+
+P_results_df = pd.DataFrame(P_results)
+
+P_results_df.to_csv(output_path, index=False, header=False)
+
+print(f"Wektor P został zapisany do pliku: {output_path}")
