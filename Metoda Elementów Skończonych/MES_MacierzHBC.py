@@ -334,7 +334,7 @@ def AnalizujPlikWejsciowy(filename):
 
             elif line.startswith('*BC'):
 
-                break  # Przestań Czytać, Ponieważ Nie Potrzebujemy Tutaj Warunków Brzegowych :)
+                break  # Przestań Czytać, Ponieważ Nie Potrzebujemy Tutaj Warunków Brzegowych :) :)
 
 
             if mode == "parameters":
