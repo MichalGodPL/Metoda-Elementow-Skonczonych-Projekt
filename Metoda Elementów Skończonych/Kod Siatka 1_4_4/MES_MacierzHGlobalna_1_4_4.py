@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 import os
 
-
 # Zdefiniuj Globalne Zmienne Do Przechowywania Parametrów Symulacji
 
 SimulationTime = None
@@ -47,66 +46,6 @@ class Element4Wezlowy:
         # Punkty Gaussa Dla Kwadratury 2x2
 
         self.PunktyGaussa = [(-1 / np.sqrt(3), -1 / np.sqrt(3)), (1 / np.sqrt(3), -1 / np.sqrt(3)), (1 / np.sqrt(3), 1 / np.sqrt(3)), (-1 / np.sqrt(3), 1 / np.sqrt(3))]
-
-        self.KrawedzieBrzegowe = []  # Przechowywanie indeksów krawędzi brzegowych
-
-
-    def ZnajdzKrawedzieBrzegowe(self, global_nodes, tolerance=1e-6):
-
-        # Granice siatki (min i max współrzędnych)
-
-        min_x = min(coord[0] for coord in global_nodes)
-
-        max_x = max(coord[0] for coord in global_nodes)
-
-        min_y = min(coord[1] for coord in global_nodes)
-
-        max_y = max(coord[1] for coord in global_nodes)
-
-
-        # Definicje krawędzi elementu (użycie lokalnych indeksów elementu)
-
-        Krawedzie = [
-
-            (self.nodes[0], self.nodes[1]),  # Dolna krawędź
-
-            (self.nodes[1], self.nodes[2]),  # Prawa krawędź
-
-            (self.nodes[2], self.nodes[3]),  # Górna krawędź
-
-            (self.nodes[3], self.nodes[0])  # Lewa krawędź
-
-        ]
-
-
-        # Znajdowanie krawędzi na brzegu siatki
-
-        KrawedzieBrzegowe = []
-
-        for edge_idx, (node1, node2) in enumerate(Krawedzie):
-
-            coord1 = node1
-
-            coord2 = node2
-
-            # Sprawdzanie, czy węzły krawędzi leżą na granicy siatki
-
-            if (
-
-                    (abs(coord1[0] - min_x) < tolerance and abs(coord2[0] - min_x) < tolerance) or
-
-                    (abs(coord1[0] - max_x) < tolerance and abs(coord2[0] - max_x) < tolerance) or
-
-                    (abs(coord1[1] - min_y) < tolerance and abs(coord2[1] - min_y) < tolerance) or
-
-                    (abs(coord1[1] - max_y) < tolerance and abs(coord2[1] - max_y) < tolerance)
-
-            ):
-
-                KrawedzieBrzegowe.append(edge_idx)  # Dodaj numer krawędzi
-
-
-        return KrawedzieBrzegowe
 
 
     def PochodneFunkcjiKsztaltu(self, xi, eta):
@@ -152,7 +91,6 @@ class Element4Wezlowy:
 
         global Conductivity
 
-
         # Iteruj Przez Każdy Punkt Gaussa Dla Całkowania Numerycznego
 
         for xi, eta in self.PunktyGaussa:
@@ -169,7 +107,6 @@ class Element4Wezlowy:
             WyznacznikJakobiego = np.linalg.det(J)
 
             OdwrotnoscJakobiego = np.linalg.inv(J)
-
 
             # Przekształć Pochodne Funkcji Kształtu do Przestrzeni Globalnej
 
@@ -197,86 +134,7 @@ class Element4Wezlowy:
         return HLokalne
 
 
-    def ObliczLokalneHbc(self, alfa, tot):
-
-        HbcLokalne = np.zeros((4, 4))  # Lokalna macierz Hbc
-
-        GaussWagi = [1, 1]  # Wagi Gaussa dla dwóch punktów
-
-        gauss_points = [-1 / np.sqrt(3), 1 / np.sqrt(3)]  # Punkty Gaussa
-
-
-        # Przejście po krawędziach (4 krawędzie w elemencie 4-węzłowym)
-
-        for edge in self.KrawedzieBrzegowe:
-
-            ksi_eta_points = []
-
-            WezlyKrawedzi = []
-
-
-            # Zidentyfikuj Węzły na Krawędzi
-
-            if edge == 0:  # Dolna krawędź (1-2)
-
-                WezlyKrawedzi = [0, 1]
-
-                ksi_eta_points = [(gauss, -1) for gauss in gauss_points]
-
-            elif edge == 1:  # Prawa krawędź (2-3)
-
-                WezlyKrawedzi = [1, 2]
-
-                ksi_eta_points = [(1, gauss) for gauss in gauss_points]
-
-            elif edge == 2:  # Górna krawędź (3-4)
-
-                WezlyKrawedzi = [2, 3]
-
-                ksi_eta_points = [(gauss, 1) for gauss in gauss_points]
-
-            elif edge == 3:  # Lewa krawędź (4-1)
-
-                WezlyKrawedzi = [3, 0]
-
-                ksi_eta_points = [(-1, gauss) for gauss in gauss_points]
-
-
-            # Przejście przez punkty całkowania na krawędzi
-
-            for i, (ksi, eta) in enumerate(ksi_eta_points):
-
-                # Oblicz funkcje kształtu w punkcie (ksi, eta)
-
-                N = np.array([
-
-                    0.25 * (1 - ksi) * (1 - eta),
-
-                    0.25 * (1 + ksi) * (1 - eta),
-
-                    0.25 * (1 + ksi) * (1 + eta),
-
-                    0.25 * (1 - ksi) * (1 + eta)
-
-                ])
-
-                # Długość krawędzi (elementarny Jakobian dla 1D)
-
-                DlugoscKrawedzi = np.linalg.norm(
-
-                    self.nodes[WezlyKrawedzi[1]] - self.nodes[WezlyKrawedzi[0]])
-
-                WyznacznikJakobianaKrawedzi = DlugoscKrawedzi / 2
-
-
-                # Dodaj składnik do macierzy Hbc
-
-                SkladnikHbc = alfa * (np.outer(N, N) * GaussWagi[i] * WyznacznikJakobianaKrawedzi)
-                
-                HbcLokalne += SkladnikHbc
-
-        return HbcLokalne
-
+# Funkcja Do Odczytu I Analizowania Pliku Tekstowego
 
 def AnalizujPlikWejsciowy(filename):
 
@@ -305,9 +163,7 @@ def AnalizujPlikWejsciowy(filename):
 
         "Nodesnumber": ("NodesNumber", int),
 
-        "Elements number": ("ElementsNumber", int)
-
-    }
+        "Elements number": ("ElementsNumber", int) }
 
 
     with open(filename, 'r') as file:
@@ -323,7 +179,7 @@ def AnalizujPlikWejsciowy(filename):
             if line.startswith('*Node'):
 
                 mode = "nodes"
-
+                
                 continue
 
             elif line.startswith('*Element'):
@@ -335,7 +191,6 @@ def AnalizujPlikWejsciowy(filename):
             elif line.startswith('*BC'):
 
                 break  # Przestań Czytać, Ponieważ Nie Potrzebujemy Tutaj Warunków Brzegowych
-
 
             if mode == "parameters":
 
@@ -365,6 +220,7 @@ def AnalizujPlikWejsciowy(filename):
 
                 Nodes.append((x, y))
 
+
             elif mode == "elements":
 
                 parts = line.split(',')
@@ -374,16 +230,36 @@ def AnalizujPlikWejsciowy(filename):
                 node_ids = list(map(lambda n: int(n.strip()), parts[1:]))
                 
                 Elements.append(node_ids)
+         
+
+def AgregacjaMacierzyZLokalnejDoGlobalnej(ObiektyElementow, nodes_number):
+
+    # Zainicjuj Globalną Macierz H Zerami
+
+    HGlobalne = np.zeros((nodes_number, nodes_number))
+
+    # Iteruj Przez Każdy Element I Jego Lokalną Macierz H
+
+    for elem, elem_nodes in zip(ObiektyElementow, Elements):
+
+        HLokalne = elem.ObliczHLokalne()
+
+        # Agreguj Lokalną Macierz H Do Globalnej Macierzy H
+
+        for i, global_i in enumerate(elem_nodes):
+
+            for j, global_j in enumerate(elem_nodes):
+
+                HGlobalne[global_i - 1, global_j - 1] += HLokalne[i, j]
+
+    return HGlobalne
 
 
-# Ponowna próba agregacji
-
-filename = r"C:\Users\Admin\Documents\GitHub\MetodaEliminacjiStudentow\Metoda Elementów Skończonych\Pliki Tekstowe\Pliki Tekstowe Siatka 2_4_4\Test2_4_4_MixGrid.txt"
+filename = r"C:\Users\Admin\Documents\GitHub\MetodaEliminacjiStudentow\Metoda Elementów Skończonych\Pliki Tekstowe\Pliki Tekstowe Siatka 1_4_4\Test1_4_4.txt"
 
 AnalizujPlikWejsciowy(filename)
 
 ObiektyElementow = []
-
 
 for elem_nodes in Elements:
 
@@ -391,17 +267,57 @@ for elem_nodes in Elements:
 
     element = Element4Wezlowy(element_coords)
 
-    element.KrawedzieBrzegowe = element.ZnajdzKrawedzieBrzegowe(Nodes)
-
     ObiektyElementow.append(element)
 
+HGlobalne = AgregacjaMacierzyZLokalnejDoGlobalnej(ObiektyElementow, NodesNumber)
 
-# Wydrukuj Macierz Hbc Dla Każdego Elementu
 
-for i, element in enumerate(ObiektyElementow):
+# Przedstawienie Macierzy H za pomocą Numpy
 
-    Hbc_local = element.ObliczLokalneHbc(Alfa, Tot)
+HGlobalne_np = np.array(HGlobalne)
 
-    print(f"\nMacierz HBC dla Elementu {i + 1}:")
+np.set_printoptions(precision=3, suppress=True)
 
-    print(pd.DataFrame(Hbc_local))
+
+# Przedstawienie Macierzy H za Pomocą Pandas
+
+HGlobalne_df = pd.DataFrame(HGlobalne_np)
+
+
+# Wypisz Macierz H
+
+print("Macierz H (Pandas):")
+
+print(HGlobalne_df)
+
+# Wyświetlenie Macierzy H jako Wykres Ciepła
+
+plt.figure(figsize=(10, 8))
+
+plt.imshow(HGlobalne_np, cmap='viridis', interpolation='none')
+
+plt.colorbar(label='Wartość')
+
+plt.title('Macierz H')
+
+plt.xlabel('Indeks Węzła')
+
+plt.ylabel('Indeks Węzła')
+
+plt.show()
+
+output_folder = 'C:/Users/Admin/Documents/GitHub/MetodaEliminacjiStudentow/Metoda Elementów Skończonych/Pliki Tekstowe/Pliki Tekstowe Siatka 1_4_4'
+
+output_filename = 'MacierzHGlobalna_Wyniki_1_4_4.csv'
+
+output_path = os.path.join(output_folder, output_filename)
+
+# Upewnij się, że Folder Istnieje
+
+os.makedirs(output_folder, exist_ok=True)
+
+# Zapisz DataFrame do pliku CSV
+
+HGlobalne_df.to_csv(output_path, index=False, header=False)
+
+print(f"Macierz H została zapisana do pliku: {output_path}")

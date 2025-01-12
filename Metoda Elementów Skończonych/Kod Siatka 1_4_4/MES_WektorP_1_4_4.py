@@ -93,27 +93,26 @@ class Element4Wezlowy:
 
             if (
 
-                    (abs(coord1[0] - min_x) < tolerance and abs(coord2[0] - min_x) < tolerance) or
+                (abs(coord1[0] - min_x) < tolerance and abs(coord2[0] - min_x) < tolerance) or
 
-                    (abs(coord1[0] - max_x) < tolerance and abs(coord2[0] - max_x) < tolerance) or
+                (abs(coord1[0] - max_x) < tolerance and abs(coord2[0] - max_x) < tolerance) or
 
-                    (abs(coord1[1] - min_y) < tolerance and abs(coord2[1] - min_y) < tolerance) or
+                (abs(coord1[1] - min_y) < tolerance and abs(coord2[1] - min_y) < tolerance) or
 
-                    (abs(coord1[1] - max_y) < tolerance and abs(coord2[1] - max_y) < tolerance)
+                (abs(coord1[1] - max_y) < tolerance and abs(coord2[1] - max_y) < tolerance)
 
             ):
 
                 KrawedzieBrzegowe.append(edge_idx)  # Dodaj numer krawędzi
-
 
         return KrawedzieBrzegowe
 
 
     def PochodneFunkcjiKsztaltu(self, xi, eta):
 
-        dN_dxi = np.array([ [-0.25 * (1 - eta), 0.25 * (1 - eta), 0.25 * (1 + eta), -0.25 * (1 + eta)],
+        dN_dxi = np.array([[-0.25 * (1 - eta), 0.25 * (1 - eta), 0.25 * (1 + eta), -0.25 * (1 + eta)],
 
-            [-0.25 * (1 - xi), -0.25 * (1 + xi), 0.25 * (1 + xi), 0.25 * (1 - xi)] ])
+                           [-0.25 * (1 - xi), -0.25 * (1 + xi), 0.25 * (1 + xi), 0.25 * (1 - xi)]])
 
         return dN_dxi
 
@@ -139,7 +138,7 @@ class Element4Wezlowy:
 
             OdwrotnoscJakobiego = np.linalg.inv(J)
 
-            Wyniki.append({ "Jakobian": J,  "Det(J)": WyznacznikJakobiego, "J^(-1)": OdwrotnoscJakobiego })
+            Wyniki.append({"Jakobian": J, "Det(J)": WyznacznikJakobiego, "J^(-1)": OdwrotnoscJakobiego})
 
         return Wyniki
 
@@ -262,9 +261,7 @@ class Element4Wezlowy:
 
                 # Długość krawędzi (elementarny Jakobian dla 1D)
 
-                DlugoscKrawedzi = np.linalg.norm(
-
-                    self.nodes[WezlyKrawedzi[1]] - self.nodes[WezlyKrawedzi[0]])
+                DlugoscKrawedzi = np.linalg.norm(self.nodes[WezlyKrawedzi[1]] - self.nodes[WezlyKrawedzi[0]])
 
                 WyznacznikJakobianaKrawedzi = DlugoscKrawedzi / 2
 
@@ -272,10 +269,89 @@ class Element4Wezlowy:
                 # Dodaj składnik do macierzy Hbc
 
                 SkladnikHbc = alfa * (np.outer(N, N) * GaussWagi[i] * WyznacznikJakobianaKrawedzi)
-                
+
                 HbcLokalne += SkladnikHbc
 
         return HbcLokalne
+
+
+    def ObliczLokalneP(self, alfa, tot):
+
+        PLokalne = np.zeros(4)  # Lokalny wektor P
+
+        GaussWagi = [1, 1]  # Wagi Gaussa dla dwóch punktów
+
+        gauss_points = [-1 / np.sqrt(3), 1 / np.sqrt(3)]  # Punkty Gaussa
+
+
+        # Przejście po krawędziach (4 krawędzie w elemencie 4-węzłowym)
+
+        for edge in self.KrawedzieBrzegowe:
+
+            ksi_eta_points = []
+
+            WezlyKrawedzi = []
+
+
+            # Zidentyfikuj Węzły na Krawędzi
+
+            if edge == 0:  # Dolna krawędź (1-2)
+
+                WezlyKrawedzi = [0, 1]
+
+                ksi_eta_points = [(gauss, -1) for gauss in gauss_points]
+
+            elif edge == 1:  # Prawa krawędź (2-3)
+
+                WezlyKrawedzi = [1, 2]
+
+                ksi_eta_points = [(1, gauss) for gauss in gauss_points]
+
+            elif edge == 2:  # Górna krawędź (3-4)
+
+                WezlyKrawedzi = [2, 3]
+
+                ksi_eta_points = [(gauss, 1) for gauss in gauss_points]
+
+            elif edge == 3:  # Lewa krawędź (4-1)
+
+                WezlyKrawedzi = [3, 0]
+
+                ksi_eta_points = [(-1, gauss) for gauss in gauss_points]
+
+
+            # Przejście przez punkty całkowania na krawędzi
+
+            for i, (ksi, eta) in enumerate(ksi_eta_points):
+
+                # Oblicz funkcje kształtu w punkcie (ksi, eta)
+
+                N = np.array([
+
+                    0.25 * (1 - ksi) * (1 - eta),
+
+                    0.25 * (1 + ksi) * (1 - eta),
+
+                    0.25 * (1 + ksi) * (1 + eta),
+
+                    0.25 * (1 - ksi) * (1 + eta)
+
+                ])
+
+                # Długość krawędzi (elementarny Jakobian dla 1D)
+
+                DlugoscKrawedzi = np.linalg.norm(self.nodes[WezlyKrawedzi[1]] - self.nodes[WezlyKrawedzi[0]])
+
+                WyznacznikJakobianaKrawedzi = DlugoscKrawedzi / 2
+
+
+                # Dodaj składnik do wektora P
+
+                SkladnikP = alfa * tot * N * GaussWagi[i] * WyznacznikJakobianaKrawedzi
+
+                PLokalne += SkladnikP
+
+        return PLokalne
 
 
 def AnalizujPlikWejsciowy(filename):
@@ -336,7 +412,6 @@ def AnalizujPlikWejsciowy(filename):
 
                 break  # Przestań Czytać, Ponieważ Nie Potrzebujemy Tutaj Warunków Brzegowych
 
-
             if mode == "parameters":
 
                 for key, (var_name, var_type) in param_map.items():
@@ -372,18 +447,18 @@ def AnalizujPlikWejsciowy(filename):
                 element_id = int(parts[0].strip())
 
                 node_ids = list(map(lambda n: int(n.strip()), parts[1:]))
-                
+
                 Elements.append(node_ids)
 
 
 # Ponowna próba agregacji
 
-filename = r"C:\Users\Admin\Documents\GitHub\MetodaEliminacjiStudentow\Metoda Elementów Skończonych\Pliki Tekstowe\Pliki Tekstowe Siatka 2_4_4\Test2_4_4_MixGrid.txt"
+filename = r"C:\Users\Admin\Documents\GitHub\MetodaEliminacjiStudentow\Metoda Elementów Skończonych\Pliki Tekstowe\Pliki Tekstowe Siatka 1_4_4\Test1_4_4.txt"
 
 AnalizujPlikWejsciowy(filename)
 
-ObiektyElementow = []
 
+ObiektyElementow = []
 
 for elem_nodes in Elements:
 
@@ -396,12 +471,43 @@ for elem_nodes in Elements:
     ObiektyElementow.append(element)
 
 
-# Wydrukuj Macierz Hbc Dla Każdego Elementu
+P_results = []
+
+# Wydrukuj Macierz Hbc Dla Każdego Elementu i oblicz wektor P
 
 for i, element in enumerate(ObiektyElementow):
 
     Hbc_local = element.ObliczLokalneHbc(Alfa, Tot)
 
+    P_local = element.ObliczLokalneP(Alfa, Tot)
+
+    P_results.append(P_local)
+
     print(f"\nMacierz HBC dla Elementu {i + 1}:")
 
     print(pd.DataFrame(Hbc_local))
+
+    print(f"\nWektor P dla Elementu {i + 1}:")
+    
+    print(P_local)
+    
+
+output_folder = 'C:/Users/Admin/Documents/GitHub/MetodaEliminacjiStudentow/Metoda Elementów Skończonych/Pliki Tekstowe/Pliki Tekstowe Siatka 1_4_4'
+
+output_filename = 'WektorP_Wyniki_1_4_4.csv'
+
+output_path = os.path.join(output_folder, output_filename)
+
+
+# Ensure the folder exists
+
+os.makedirs(output_folder, exist_ok=True)
+
+
+# Convert P_results to DataFrame and save to CSV
+
+P_results_df = pd.DataFrame(P_results)
+
+P_results_df.to_csv(output_path, index=False, header=False)
+
+print(f"Wektor P został zapisany do pliku: {output_path}")

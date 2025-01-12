@@ -1,0 +1,1 @@
+'MacierzCGlobalna_Wyniki_1_4_4.csv'
