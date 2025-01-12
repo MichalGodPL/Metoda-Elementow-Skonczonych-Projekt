@@ -10,7 +10,9 @@ def AnalizujPlikWejsciowy(filename):
 
     param_map = {
         "SimulationTime": ("SimulationTime", int),
-        "SimulationStepTime": ("SimulationStepTime", int)
+        "SimulationStepTime": ("SimulationStepTime", int),
+        "InitialTemp": ("InitialTemp", int),
+        "Nodesnumber": ("Nodesnumber", int)
     }
 
     with open(filename, 'r') as file:
@@ -61,9 +63,9 @@ print(type(H_globalne), type(C_globalne), type(P_globalne))
 Delta_tau = SimulationStepTime
 CzasSymulacji = SimulationTime
 
-TemperaturaPoczatkowa = 100
+TemperaturaPoczatkowa = InitialTemp
 
-t0 = np.full((16, 1), TemperaturaPoczatkowa )
+t0 = np.full((Nodesnumber, 1), TemperaturaPoczatkowa ) # W plikach tekstowych zmień żeby było tak jak tutaj
 
 obecny_czas = 0.0
 
