@@ -379,7 +379,7 @@ def AnalizujPlikWejsciowy(filename):
 
         "SpecificHeat": ("SpecificHeat", float),
 
-        "Nodes number": ("NodesNumber", int),
+        "Nodesnumber": ("NodesNumber", int),
 
         "Elements number": ("ElementsNumber", int)
 
@@ -453,7 +453,7 @@ def AnalizujPlikWejsciowy(filename):
 
 # Ponowna próba agregacji
 
-filename = r"C:\Users\Admin\Desktop\Metoda Elementów Skończonych\Pliki Tekstowe\Test2_4_4_MixGrid.txt"
+filename = r"C:\Users\Admin\Documents\GitHub\MetodaEliminacjiStudentow\Metoda Elementów Skończonych\Pliki Tekstowe\Pliki Tekstowe Siatka 2_4_4\Test2_4_4_MixGrid.txt"
 
 AnalizujPlikWejsciowy(filename)
 
@@ -492,9 +492,9 @@ for i, element in enumerate(ObiektyElementow):
     print(P_local)
     
 
-output_folder = 'C:/Users/Admin/Documents/GitHub/MetodaEliminacjiStudentow/Metoda Elementów Skończonych/Pliki Tekstowe'
+output_folder = 'C:/Users/Admin/Documents/GitHub/MetodaEliminacjiStudentow/Metoda Elementów Skończonych/Pliki Tekstowe/Pliki Tekstowe Siatka 2_4_4'
 
-output_filename = 'WektorPWyniki2_4_4.csv'
+output_filename = 'WektorP_Wyniki_2_4_4.csv'
 
 output_path = os.path.join(output_folder, output_filename)
 
