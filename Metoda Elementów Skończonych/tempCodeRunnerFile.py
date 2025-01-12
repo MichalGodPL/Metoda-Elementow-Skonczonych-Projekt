@@ -1,1 +1,3 @@
-  P_results.append(P_local)
+   # print("========================================\n")
+
+    # print (P_globalne)
